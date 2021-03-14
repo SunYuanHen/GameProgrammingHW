@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#info {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+  color: #00ffff
+}
+body {
+  overflow: hidden;
+}
+</style>
+</head>
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<body>
+<div id="info">HW0.js
+<br>
+<button id="trainturn" onclick="ButtonEvent()">Press To Stop</button>
+<br>
+<p id="turn">左移</p>
+<p id="time"></p>
+<script>
+var camera,scene,renderer,clock,train;
+var angle = Math.PI/2;
+var stop = 0;
+//mode 0 = 左移, 1 = 左半圈, 2 = 右移, 3 = 右半圈, 4 = Stop
+var mode = 0;
+var line = 0;
+var saved_mode = 0;
+var time = 0;
+var temp_time = 0;
+var time_set = 0;
+init();
+animate();
+function init() {
+  scene = new THREE.Scene();
+  clock = new THREE.Clock();
+  another_clock = new THREE.Clock();
+  time = another_clock.getDelta()
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x888888);
+  document.body.appendChild(renderer.domElement);
+  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000);
+  camera.position.set (0, 40, 50);
+  let controls = new THREE.OrbitControls(camera, renderer.domElement);
+  var gridXZ = new THREE.GridHelper(200, 20, 'red', 'white');
+  scene.add(gridXZ);
+  train = new THREE.Mesh(new THREE.BoxGeometry (10,10,30), new THREE.MeshNormalMaterial());
+  trainhead = new THREE.Mesh(new THREE.CylinderGeometry(5,5,20,32),new THREE.MeshNormalMaterial({color: 0x888888}));
+  trainhead.position.y = 5;
+  trainhead.position.z = -10;
+  scene.add(train);
+  train.add(trainhead);
+}
+
+function animate() {
+  var radius = 50;
+  var dt;
+  if(mode == 0){
+    train.position.set(line,5,-50);
+    train.rotation.y = Math.PI/2;
+    line -= 1.5;
+    if(line <= -50){
+	  clock.start();
+      mode = 1;
+	  angle = Math.PI/2;
+	  document.getElementById('turn').textContent = '左半圈';
+    }
+	if(line < 0 && time_set == 1){
+		time = another_clock.getDelta();
+		time += temp_time;
+		document.getElementById('time').textContent = '一圈時間:'+time.toFixed(2);
+		time_set = 0;
+		temp_time = 0;
+	}
+  } 
+  else if(mode == 1){
+	train.position.set(line + radius*Math.cos(angle), 5, -radius* Math.sin(angle));
+    train.rotation.y = angle;
+	dt = clock.getDelta();
+    angle += 15*0.10472*dt;   
+	if(line + radius* Math.cos(angle) > -50){
+	  clock.stop();
+      mode = 2;
+	  document.getElementById('turn').textContent = '右移';
+    }
+  }
+  else if(mode == 2){
+  	train.position.set(line,5,50);
+    train.rotation.y = Math.PI/2*3;
+    line += 1.5;
+    if(line >= 50){
+	  clock.start();
+      mode = 3;
+	  document.getElementById('turn').textContent = '右半圈';
+    }
+	if(line > 0){
+	  time_set = 1;
+	}
+  }
+  else if(mode == 3){
+    train.position.set(line + radius*Math.cos(angle), 5, -radius* Math.sin(angle));
+    train.rotation.y = angle;
+    dt = clock.getDelta();
+    angle += 15*0.10472*dt;
+    if(line + radius*Math.cos(angle) < 50){
+	  clock.stop();
+      mode = 0;
+	  angle = 90;
+	  document.getElementById('turn').textContent = '左移';
+    }
+  }
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+function ButtonEvent(){
+    if(stop == 0){
+		clock.stop();
+		temp_time += another_clock.getDelta();
+		another_clock.stop();
+		stop = 1;
+        saved_mode = mode;
+        mode = 4;
+       	document.getElementById('turn').textContent = '停止';
+		document.getElementById('trainturn').textContent = 'Press To Go';
+    }
+    else{
+		clock.start();
+		another_clock.start();
+       	stop = 0;
+        mode = saved_mode;
+		if(mode == 0)document.getElementById('turn').textContent = '左移';
+		else if(mode == 1)document.getElementById('turn').textContent = '左半圈';
+		else if(mode == 2)document.getElementById('turn').textContent = '右移';
+		else if(mode == 3)document.getElementById('turn').textContent = '右半圈';
+       	document.getElementById('trainturn').textContent = 'Press To Stop';
+    }
+}
+</script>
+</div>
+</body>
+</html>
