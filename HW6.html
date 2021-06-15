@@ -20,7 +20,7 @@ body {
 </head>
 
 <body> 
-<div id="info">BSP Helper
+<div id="info">HW6
 </div>
 <script src="https://threejs.org/build/three.min.js"></script>
 <script src="https://jyunming-chen.github.io/tutsplus/js/KeyboardState.js"></script>
@@ -85,88 +85,42 @@ function make3JSLoop() {
 
 function buildTree () {
   // outer wall
-  A = new Point (0,0);
-  B = new Point (5,0);
-  C = new Point (5,5);
-  D = new Point (0,5);
+  A = new Point (0,5);
+  B = new Point (2,1);
+  C = new Point (7,3);
+  D = new Point (5,6);
   
   make3JSLoop (A,B,C,D,A);    
 
   // inner wall
-  E = new Point (2,2);
-  F = new Point (2,3);
-  G = new Point (3,2);
+  E = new Point (2,3);
+  F = new Point (2,4);
+  G = new Point (3,3);
   make3JSLoop (E,F,G,E);
 
 
    let L1 = new BSPNode (A, B);
-	   let L1b = L1.break (new Point(2,0)); 
-	   let L1a = L1;
    let L2 = new BSPNode (B, C);
+	   let L2b = L2.break (new Point(4.5,2)); 
+	   let L2a = L2;	
    let L3 = new BSPNode (C, D);
-	   let L3b = L3.break (new Point(2,5)); 
-	   let L3a = L3;
-   let L4 = new BSPNode (D, A);
-
+   let L4 = new BSPNode (D, A);   
+	   let L4b = L4.break (new Point(2,5.4)); 
+	   let L4a = L4;	
    let L5 = new BSPNode (E, F);
    let L6 = new BSPNode (F, G);
    let L7 = new BSPNode (G, E);
    
-   // build BSP tree by hand (inorder traversal)
-   L5.setLeftChild (L3b);
-   L3b.setLeftChild (L4);   
-   L4.setLeftChild (L1a);
-
+   // build BSP tree by hand (inorder traversal) 
+   L5.setLeftChild (L4a);
+   L4a.setLeftChild (L1);   
+   L1.setLeftChild (L2a);
    L5.setRightChild (L6);
-   L6.setLeftChild (L2);
-   L2.setLeftChild (L3a);
-
+   L6.setLeftChild (L3);
+   L2.setLeftChild (L4b);
    L6.setRightChild (L7);
-   L7.setLeftChild (L1b);
-
-   return L5;  // the root node
-}
-
-//
-// degenerate inner obstacle
-// does not work ...
-//
-function buildTree2 () {
-  // outer wall
-  A = new Point (0,0);
-  B = new Point (5,0);
-  C = new Point (5,5);
-  D = new Point (0,5);
-
-  make3JSLoop (A,B,C,D,A);    
-
-  E = new Point (2,2);
-  F = new Point (2,3);
-
-  make3JSLoop (E,F);
-      
-   let L1 = new BSPNode (A, B);
-	   let L1b = L1.break (new Point(2,0)); 
-	   let L1a = L1;
-   let L2 = new BSPNode (B, C);
-   let L3 = new BSPNode (C, D);
-	   let L3b = L3.break (new Point(2,5)); 
-	   let L3a = L3;
-   let L4 = new BSPNode (D, A);
-
-   let L5 = new BSPNode (E, F);
-   let L6 = new BSPNode (F, E);
+   L7.setLeftChild (L2b);
    
-// build BSP tree by hand (inorder traversal)
-   L5.setLeftChild (L3b);
-   L3b.setLeftChild (L4);   
-   L4.setLeftChild (L1a);
-
-   L5.setRightChild (L6);
-   L6.setLeftChild (L2);
-   L2.setLeftChild (L3a);
-   L3a.setLeftChild (L1b);
-
    return L5;  // the root node
 }
 
@@ -188,19 +142,16 @@ function inOut (x,y, node, r = 0) { // 半徑(r) default 為 0
 
 function init() {
 
-  renderer = new THREE.WebGLRenderer({
-    antialias: true
-  });
-
+  renderer = new THREE.WebGLRenderer({antialias: true});
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setClearColor(0x888888);
   document.body.appendChild(renderer.domElement);
 
   scene = new THREE.Scene();
-  camera = new THREE.OrthographicCamera(-1, 6, 6, -1, -10, 100);
+  camera = new THREE.OrthographicCamera(-1, 7, 6, -1, -10, 100);
   camera.position.z = 10;
 
-  let grid = new THREE.GridHelper(12,12,'red','white');
+  let grid = new THREE.GridHelper(20,20,'red','white');
   grid.rotation.x = -Math.PI/2
   scene.add (grid);
 
