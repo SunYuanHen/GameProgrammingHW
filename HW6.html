@@ -101,7 +101,7 @@ function buildTree () {
 
    let L1 = new BSPNode (A, B);
    let L2 = new BSPNode (B, C);
-	   let L2b = L2.break (new Point(4.5,2)); 
+	   let L2b = L2.break (new Point(4.1,1.8)); 
 	   let L2a = L2;	
    let L3 = new BSPNode (C, D);
    let L4 = new BSPNode (D, A);   
@@ -112,15 +112,14 @@ function buildTree () {
    let L7 = new BSPNode (G, E);
    
    // build BSP tree by hand (inorder traversal) 
-   L5.setLeftChild (L4a);
-   L4a.setLeftChild (L1);   
-   L1.setLeftChild (L2a);
-   L5.setRightChild (L6);
-   L6.setLeftChild (L3);
-   L2.setLeftChild (L4b);
-   L6.setRightChild (L7);
-   L7.setLeftChild (L2b);
-   
+   L5.setLeftChild(L4a);
+   L4a.setLeftChild(L1);
+   L5.setRightChild(L6);
+   L6.setLeftChild(L2b);
+   L2b.setLeftChild(L3);
+   L3.setLeftChild(L4b);
+   L6.setRightChild(L7);
+   L7.setLeftChild(L2a);
    return L5;  // the root node
 }
 
